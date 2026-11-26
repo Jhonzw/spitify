@@ -137,13 +137,15 @@ struct CollectionLayout<Cover: View, Actions: View, Content: View>: View {
         .toolbarBackground(color.mix(p.background, 0.3), for: .navigationBar)
     }
     private var header: some View {
-        let collapse = theme.reduceMotion ? 0 : Swift.min(1, Swift.max(0, -offset / 300))
+        let collapse: CGFloat = theme.reduceMotion ? 0 : Swift.min(1, Swift.max(0, -offset / 300))
+        let coverScale: CGFloat = 1 - collapse * 0.25
+        let coverOpacity: Double = Double(1 - collapse * 1.1)
         let headerColor = p.isDark ? color : color.mix(.white, 0.55)
         return VStack(alignment: .leading, spacing: 6) {
             cover()
                 .frame(width: portrait ? 180 : MediaLayout.cover, height: portrait ? 250 : MediaLayout.cover)
                 .shadow(color: .black.opacity(p.isDark ? 0.45 : 0.2), radius: 24, y: 12)
-                .scaleEffect(1 - collapse * 0.25).opacity(1 - collapse * 1.1)
+                .scaleEffect(coverScale).opacity(coverOpacity)
                 .frame(maxWidth: .infinity).padding(.top, 8)
             Text(title).text(.headlineL).foregroundStyle(p.text)
                 .fixedSize(horizontal: false, vertical: true)

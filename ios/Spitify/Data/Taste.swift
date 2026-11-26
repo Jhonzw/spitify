@@ -215,8 +215,15 @@ enum PlaylistGenerator {
         let weekday = { let f = DateFormatter(); f.dateFormat = "EEEE"; return f.string(from: input.now).lowercased() }()
         let partSongs = m.daypartSong[part] ?? [:]
         var rd = SeededRandom(daySeed * 10 + part.rawValue)
-        let daylist = Array(diversify(songs.filter { partGenres.isEmpty || $0.genreKey.map(partGenres.contains) == true }
-            .map { ($0, (partSongs[$0.id] ?? 0) * 0.8 + m.predicted($0) * 0.5 + rd.double() * 0.3) }.sorted { $0.1 > $1.1 }.map(\.0), maxPerArtist: 4).prefix(40))
+        let partPool: [Song] = songs.filter { s in partGenres.isEmpty || s.genreKey.map(partGenres.contains) == true }
+        var partScored: [(Song, Double)] = []
+        for s in partPool {
+            let base: Double = (partSongs[s.id] ?? 0) * 0.8
+            let predicted: Double = m.predicted(s) * 0.5
+            partScored.append((s, base + predicted + rd.double() * 0.3))
+        }
+        partScored.sort { $0.1 > $1.1 }
+        let daylist = Array(diversify(partScored.map(\.0), maxPerArtist: 4).prefix(40))
         if daylist.count >= 5 {
             let name = "daylist • \(part.mood) \(partGenres.joined(separator: " ")) \(weekday) \(part.label)".replacingOccurrences(of: "  ", with: " ")
             out.append(Mix(id: "daylist", title: name, description: "Your day in music, updated through the day based on what you play at this hour.",

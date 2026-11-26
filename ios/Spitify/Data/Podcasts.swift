@@ -206,7 +206,12 @@ final class ShowsStore {
         guard let root = await HTTP.json("https://archive.org/metadata/\(r.id)") as? [String: Any], let files = root["files"] as? [[String: Any]] else { return nil }
         var mp3s = files.filter { ($0["name"] as? String ?? "").hasSuffix("_64kb.mp3") }
         if mp3s.isEmpty { mp3s = files.filter { ($0["name"] as? String ?? "").lowercased().hasSuffix(".mp3") && ($0["source"] as? String) == "original" } }
-        mp3s.sort { (Int(($0["track"] as? String ?? "").split(separator: "/").first ?? "") ?? .max, $0["name"] as? String ?? "") < (Int(($1["track"] as? String ?? "").split(separator: "/").first ?? "") ?? .max, $1["name"] as? String ?? "") }
+        func sortKey(_ f: [String: Any]) -> (Int, String) {
+            let track: String = f["track"] as? String ?? ""
+            let first: Substring = track.split(separator: "/").first ?? ""
+            return (Int(first) ?? .max, f["name"] as? String ?? "")
+        }
+        mp3s.sort { sortKey($0) < sortKey($1) }
         let episodes = mp3s.enumerated().map { i, f -> Episode in
             let name = f["name"] as? String ?? ""
             let enc = name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? name
