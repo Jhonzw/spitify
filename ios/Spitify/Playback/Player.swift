@@ -106,7 +106,9 @@ final class Player {
         engine.onFinished = { [weak self] in self?.trackEnded() }
         stream.onFinished = { [weak self] in self?.trackEnded() }
         stream.onError = { [weak self] in
-            self?.skipFailedTrack()
+            guard let self else { return }
+            // Mid-song the source stopped answering: keep this song and its position instead of skipping it.
+            if self.position >= 3 { self.holdAfterStreamFailure() } else { self.skipFailedTrack() }
         }
         configureSession()
         updateAudioOutput()
@@ -499,6 +501,19 @@ final class Player {
         automaticQueueIndices.formUnion(queue.count..<(queue.count + songs.count))
         queue.append(contentsOf: songs)
         saveQueue()
+    }
+
+    /// Pauses on the same song; Play reloads it from the saved position.
+    private func holdAfterStreamFailure() {
+        guard let song = current else { return }
+        let at = position
+        // Stop the ticker first: a stopped stream reports 0 s and would overwrite the saved position.
+        ticker?.invalidate(); ticker = nil
+        stream.stop(); isPlaying = false; needsLoad = true; position = at
+        saveProgress(); saveQueue(); updateNowPlaying()
+        let m = "“\(song.title)” stopped loading. The source is not responding — press Play to try again."
+        message = m
+        Task { try? await Task.sleep(for: .seconds(8)); if message == m { message = nil } }
     }
 
     private func skipFailedTrack() {

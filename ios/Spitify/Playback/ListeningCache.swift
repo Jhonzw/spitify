@@ -53,6 +53,8 @@ final class MusicResourceLoader: NSObject, AVAssetResourceLoaderDelegate, URLSes
     private var readURL: URL
     private var lastTrim: Int64 = 0
     private var requestOffset: Int64 = 0
+    private var resumes = 0
+    static let maxResumes = 4
     init(track: OnlineTrack,
          sourceURL: @escaping (OnlineTrack) -> URL? = { track in track.audioURL.flatMap { AudioFallback.validAudioURL($0) ? URL(string: $0) : nil } ?? (try? MonochromeClient.audioURL(track.id)) },
          alternate: @escaping (OnlineTrack) async throws -> OnlineTrack? = AudioFallback.resolve) {
@@ -155,7 +157,12 @@ final class MusicResourceLoader: NSObject, AVAssetResourceLoaderDelegate, URLSes
     }
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard task === transfer, !cancelled, failure == nil else { return }
-        if let error { if (error as NSError).code != NSURLErrorCancelled { failOrFindCopy(error) }; return }
+        if let error {
+            guard (error as NSError).code != NSURLErrorCancelled else { return }
+            // A dropped or stalled connection mid-song: continue from the bytes already saved.
+            if size > 0, resumeAfterDrop(session) { return }
+            failOrFindCopy(error); return
+        }
         guard size > 0 else { failOrFindCopy(MusicSourceError.message("The source did not return audio.")); return }
         if expected > size {
             // Some hosts return a bounded range even without a Range request. Continue from exactly that byte.
@@ -171,6 +178,19 @@ final class MusicResourceLoader: NSObject, AVAssetResourceLoaderDelegate, URLSes
             readURL = destination; expected = size; complete = true; contentType = detectType(destination)
             serve(); session.finishTasksAndInvalidate(); ListeningCache.trim()
         } catch { fail(error) }
+    }
+    /// Network drops (Wi-Fi/cellular handoff, weak signal, idle timeout) are retried with a Range request
+    /// from the last saved byte. Server refusals (HTTP errors such as 429) are not retried here.
+    private func resumeAfterDrop(_ old: URLSession) -> Bool {
+        guard resumes < Self.maxResumes, expected <= 0 || size < expected else { return false }
+        resumes += 1
+        let delay = Double(resumes)
+        old.invalidateAndCancel(); transfer = nil
+        ListeningCache.queue.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self, !self.cancelled, self.failure == nil, !self.complete else { return }
+            self.fetch(offset: self.size)
+        }
+        return true
     }
     private func failOrFindCopy(_ error: Error) {
         guard size == 0, attempts < 4, lookup == nil else { fail(error); return }

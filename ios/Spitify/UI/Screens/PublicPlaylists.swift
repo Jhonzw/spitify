@@ -96,6 +96,17 @@ struct SharedPlaylistView: View {
     // Re-match when the playlist or the library changes, without joining every song into a string on each redraw.
     private var matchingRevision: String { playlist.key + ":" + String(playlist.revision) + ":" + String(app.library.libraryRevision) }
     private var saved: Bool { app.social.state.playlists[initial.key] != nil }
+    /// A fresh read of a saved Spotify playlist whose song list changed since it was saved.
+    private var spotifyUpdate: SharedPlaylist? {
+        guard let stored = app.social.state.playlists[initial.key], stored.owner == app.social.publicKey,
+              initial.sourceName == "Spotify", stored.sourceURL == initial.sourceURL, !initial.tracks.isEmpty else { return nil }
+        let sameSongs = stored.tracks.map(PlaylistMatches.key) == initial.tracks.map(PlaylistMatches.key)
+        guard !sameSongs || stored.sourceCount != initial.sourceCount else { return nil }
+        var merged = stored
+        merged.tracks = initial.tracks; merged.sourceCount = initial.sourceCount; merged.partial = initial.partial
+        merged.revision += 1; merged.updatedAt = SocialRules.now
+        return merged
+    }
 
     var body: some View {
         CollectionLayout(title: playlist.name,
@@ -110,6 +121,16 @@ struct SharedPlaylistView: View {
                 else { play(from: 0) }
             }) {
                 saveButton
+                if let update = spotifyUpdate {
+                    Button {
+                        do {
+                            let added = update.tracks.count - playlist.tracks.count
+                            try app.social.save(update); SharedSongMatch.prepare(update, app: app)
+                            message = added > 0 ? "Updated from Spotify: \(added) new songs." : "Updated from Spotify."
+                        } catch { message = error.localizedDescription }
+                    } label: { IconControlLabel(symbol: "arrow.triangle.2.circlepath") }
+                        .accessibilityLabel("Update from Spotify")
+                }
                 if saved, playlist.owner == app.social.publicKey {
                     NavigationLink { PlaylistSharingView(playlist: playlist) } label: { IconControlLabel(symbol: "square.and.arrow.up") }
                         .accessibilityLabel("Share with friends")
