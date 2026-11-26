@@ -16,7 +16,7 @@ enum SyncJSON: Hashable, Sendable, Codable {
         if c.decodeNil() { self = .null }
         else if let v = try? c.decode(Bool.self) { self = .bool(v) }
         else if let v = try? c.decode(Int64.self) { self = .int(v) }
-        else if let v = try? c.decode(Double.self) { self = v.rounded() == v && abs(v) < 9e15 ? .int(Int64(v)) : .double(v) }
+        else if let v = try? c.decode(Double.self) { self = v.rounded() == v && Swift.abs(v) < 9e15 ? .int(Int64(v)) : .double(v) }
         else if let v = try? c.decode(String.self) { self = .string(v) }
         else if let v = try? c.decode([SyncJSON].self) { self = .array(v) }
         else { self = .object(try c.decode([String: SyncJSON].self)) }
@@ -448,7 +448,7 @@ final class LibrarySync: @unchecked Sendable {
     private static func javaDouble(_ d: Double) -> String {
         if d.isNaN { return "NaN" }
         if d.isInfinite { return d > 0 ? "Infinity" : "-Infinity" }
-        let magnitude = abs(d)
+        let magnitude = Swift.abs(d)
         if magnitude >= 1e-3 && magnitude < 1e7 { return "\(d)" }
         // Shortest round-trip digits from Swift, re-laid out as d.dddE±n.
         let text = "\(magnitude)"

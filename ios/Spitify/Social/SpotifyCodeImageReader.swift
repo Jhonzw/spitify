@@ -42,7 +42,7 @@ enum SpotifyCodeImageReader {
                             let bars = Array(runs[offset..<(offset + 23)]), centers = bars.map { ($0.0 + $0.1) / 2 }
                             let spacing = Double(centers[22] - centers[0]) / 22
                             guard spacing >= 4,
-                                  zip(centers.dropFirst(), centers).allSatisfy({ abs(Double($0.0 - $0.1) - spacing) < spacing * 0.18 }),
+                                  zip(centers.dropFirst(), centers).allSatisfy({ Swift.abs(Double($0.0 - $0.1) - spacing) < spacing * 0.18 }),
                                   bars.allSatisfy({ Double($0.1 - $0.0 + 1) < spacing * 0.8 }) else { continue }
                             let lengths = centers.map { x -> Int in
                                 var a = y, b = y
@@ -51,7 +51,7 @@ enum SpotifyCodeImageReader {
                                 return b - a + 1
                             }
                             let small = Double(lengths[0] + lengths[22]) / 2, large = Double(lengths[11])
-                            guard large > small * 2, abs(Double(lengths[0] - lengths[22])) < spacing * 0.4 else { continue }
+                            guard large > small * 2, Swift.abs(Double(lengths[0] - lengths[22])) < spacing * 0.4 else { continue }
                             let levels = lengths.map { Int(((Double($0) - small) / (large - small) * 7).rounded()) }
                             guard tried.insert(levels).inserted else { continue }
                             if let value = SpotifyCodeDecoder.decode(levels) ?? SpotifyCodeDecoder.decode(Array(levels.reversed())) { return value }

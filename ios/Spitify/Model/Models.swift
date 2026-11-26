@@ -118,7 +118,7 @@ struct Library {
         let creditMatches = saved.filter { isDownloadedCopy(local, of: $0) }.compactMap(\.artistNames)
         if local.artistNames == nil, Set(creditMatches).count == 1 { local.artistNames = creditMatches.first }
         guard local.album.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || local.album == "Unknown album" else { return local }
-        let matches = saved.filter { songMatchKey($0) == songMatchKey(local) && !$0.album.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && $0.album != "Unknown album" && abs($0.durationMs - local.durationMs) <= 5000 }
+        let matches = saved.filter { songMatchKey($0) == songMatchKey(local) && !$0.album.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && $0.album != "Unknown album" && Swift.abs($0.durationMs - local.durationMs) <= 5000 }
         guard Set(matches.map(\.albumKey)).count == 1, let match = matches.first else { return local }
         var result = local; result.album = match.album; result.albumArtist = match.albumArtist; result.artistNames = local.artistNames ?? match.artistNames; result.artURL = local.artURL ?? match.artURL
         return result
@@ -127,7 +127,7 @@ struct Library {
         let missingAlbum = saved.album.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         return SearchMatch.fold(local.title) == SearchMatch.fold(saved.title)
             && SearchMatch.fold(local.artist) == SearchMatch.fold(saved.artist)
-            && (saved.durationMs <= 0 || local.durationMs <= 0 || abs(local.durationMs - saved.durationMs) <= 5000)
+            && (saved.durationMs <= 0 || local.durationMs <= 0 || Swift.abs(local.durationMs - saved.durationMs) <= 5000)
             && (missingAlbum || AudioFallback.sameRelease(local.album, saved.album))
     }
     static func build(_ songs: [Song]) -> Library {

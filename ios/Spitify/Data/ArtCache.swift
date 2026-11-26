@@ -114,7 +114,7 @@ final class ArtCache: @unchecked Sendable {
             let pr = Double(px[i]) / 255, pg = Double(px[i + 1]) / 255, pb = Double(px[i + 2]) / 255
             let mx = Swift.max(pr, pg, pb), mn = Swift.min(pr, pg, pb)
             let sat = mx == 0 ? 0 : (mx - mn) / mx
-            let w = 0.05 + sat * sat * (1 - abs(mx - 0.6))
+            let w = 0.05 + sat * sat * (1 - Swift.abs(mx - 0.6))
             r += pr * w; g += pg * w; b += pb * w; wsum += w
         }
         r /= wsum; g /= wsum; b /= wsum

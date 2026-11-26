@@ -201,7 +201,7 @@ struct EqualizerView: View {
                         ForEach(0..<10, id: \.self) { i in
                             VStack(spacing: 1) {
                                 Text(eqFrequencies[i] >= 1000 ? "\(Int(eqFrequencies[i] / 1000))k" : "\(Int(eqFrequencies[i]))").text(.labelS).foregroundStyle(p.secondary)
-                                Text(String(format: "%+.0f", player.eq.gains[i])).text(.labelS).foregroundStyle(abs(player.eq.gains[i]) > 0.01 ? p.accent : p.tertiary)
+                                Text(String(format: "%+.0f", player.eq.gains[i])).text(.labelS).foregroundStyle(Swift.abs(player.eq.gains[i]) > 0.01 ? p.accent : p.tertiary)
                             }.frame(maxWidth: .infinity)
                         }
                     }

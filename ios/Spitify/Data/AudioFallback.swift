@@ -3,7 +3,7 @@ import Foundation
 /// Public audio lookup on this device. A login or access challenge ends the attempt.
 enum AudioFallback {
     static func matches(_ track: OnlineTrack, title: String, author: String, durationMs: Int64) -> Bool {
-        guard track.durationMs > 0, abs(track.durationMs - durationMs) <= 3_000 else { return false }
+        guard track.durationMs > 0, Swift.abs(track.durationMs - durationMs) <= 3_000 else { return false }
         func clean(_ value: String) -> String {
             SearchMatch.fold(value).replacingOccurrences(of: "\\b(feat|ft|featuring)\\b", with: " ", options: .regularExpression)
                 .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression).trimmingCharacters(in: .whitespaces)
@@ -49,7 +49,7 @@ enum AudioFallback {
         for choice in choices.filter({ !tried.contains($0.id) && $0.playable &&
             SearchMatch.fold($0.title) == SearchMatch.fold(track.title) &&
             SearchMatch.fold($0.artist) == SearchMatch.fold(track.artist) &&
-            track.durationMs > 0 && abs($0.durationMs - track.durationMs) <= 3000 }).prefix(5) {
+            track.durationMs > 0 && Swift.abs($0.durationMs - track.durationMs) <= 3000 }).prefix(5) {
             try Task.checkCancellation()
             guard let release = try? await album(choice.releaseID),
                 let match = release.first(where: { $0.id == choice.id }), sameRelease(track.album, match.album) else { continue }

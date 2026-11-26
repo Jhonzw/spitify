@@ -380,7 +380,7 @@ final class AppLibrarySyncHost: LibrarySyncHost {
         case "accent": guard let v = value == nil ? Int64(d.accent) : value?.long else { return false }; theme.accent = UInt32(v & 0xFF_FFFF)
         case "accentFromArt": guard let v = value == nil ? false : value?.bool else { return false }; theme.accentSource = v ? .artwork : .preset
         case "font": guard let v = value == nil ? d.font : Self.value(value?.string, Self.fonts) else { return false }; theme.font = v
-        case "textScale": guard let v = value == nil ? d.textScale : value?.double.flatMap({ s in Self.textScales.min { abs($0.1 - s) < abs($1.1 - s) }?.0 }) else { return false }; theme.textScale = v
+        case "textScale": guard let v = value == nil ? d.textScale : value?.double.flatMap({ s in Self.textScales.min { Swift.abs($0.1 - s) < Swift.abs($1.1 - s) }?.0 }) else { return false }; theme.textScale = v
         case "artShape": guard let v = value == nil ? d.artShape : Self.value(value?.string, Self.artShapes) else { return false }; theme.artShape = v
         case "playerStyle": guard let v = value == nil ? d.playerStyle : Self.value(value?.string, Self.playerStyles) else { return false }; theme.playerStyle = v
         case "artworkTint": guard let v = value == nil ? d.artworkTint : value?.bool else { return false }; theme.artworkTint = v
@@ -423,7 +423,7 @@ final class AppLibrarySyncHost: LibrarySyncHost {
     private func resolve(_ key: String, _ track: SharedTrack?, index: [String: [String]], search: Bool) -> Song? {
         if let id = matched[key], let song = song(id) { return song }
         let target = track?.durationMs ?? 0
-        if let local = (index[key] ?? []).compactMap(song).min(by: { abs($0.durationMs - target) < abs($1.durationMs - target) }) { return remember(key, track, local) }
+        if let local = (index[key] ?? []).compactMap(song).min(by: { Swift.abs($0.durationMs - target) < Swift.abs($1.durationMs - target) }) { return remember(key, track, local) }
         guard let track else { return nil }
         if track.sourceID != nil { return remember(key, track, app.musicStreams.register(Self.online(track))) }
         if search && unmatched[key] == nil && resolving.insert(key).inserted { queue.append((key, track)); pump() }

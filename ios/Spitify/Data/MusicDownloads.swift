@@ -288,7 +288,7 @@ final class MusicDownloads {
         let rate = file.processingFormat.sampleRate
         guard rate > 0, file.length > 0 else { throw MusicSourceError.message("The download contains no audio.") }
         let duration = Double(file.length) / rate
-        guard duration.isFinite, track.durationMs <= 0 || abs(duration * 1000 - Double(track.durationMs)) <= 5000 else {
+        guard duration.isFinite, track.durationMs <= 0 || Swift.abs(duration * 1000 - Double(track.durationMs)) <= 5000 else {
             throw MusicSourceError.message("The downloaded audio does not match this song.")
         }
         // Opening a container alone does not prove its audio decodes. Check samples at both ends.

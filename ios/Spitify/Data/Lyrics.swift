@@ -141,8 +141,8 @@ final class LyricsService {
         }
         if let o = try await HTTP.fetchJSON("https://lrclib.net/api/get?artist_name=\(HTTP.q(s.artist))&track_name=\(HTTP.q(s.title))&album_name=\(HTTP.q(s.album))&duration=\(secs)") as? [String: Any], let t = pick(o) { return t }
         guard let arr = try await HTTP.fetchJSON("https://lrclib.net/api/search?track_name=\(HTTP.q(s.title))&artist_name=\(HTTP.q(s.artist))") as? [[String: Any]] else { return nil }
-        return arr.filter { abs(($0["duration"] as? Double ?? 0) - Double(secs)) <= 5 }
-            .sorted { abs(($0["duration"] as? Double ?? 0) - Double(secs)) < abs(($1["duration"] as? Double ?? 0) - Double(secs)) }
+        return arr.filter { Swift.abs(($0["duration"] as? Double ?? 0) - Double(secs)) <= 5 }
+            .sorted { Swift.abs(($0["duration"] as? Double ?? 0) - Double(secs)) < Swift.abs(($1["duration"] as? Double ?? 0) - Double(secs)) }
             .lazy.compactMap(pick).first
     }
 }

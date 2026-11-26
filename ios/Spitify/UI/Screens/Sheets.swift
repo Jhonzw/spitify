@@ -199,7 +199,7 @@ struct MetadataEditor: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(c.title).lineLimit(1)
                                         Text([c.artist, c.album].filter { !$0.isEmpty }.joined(separator: " • ")).text(.caption).foregroundStyle(.secondary).lineLimit(1)
-                                        let diff = !albumMode && first.durationMs > 0 && c.durationMs > 0 ? abs(c.durationMs - first.durationMs) / 1000 : nil
+                                        let diff = !albumMode && first.durationMs > 0 && c.durationMs > 0 ? Swift.abs(c.durationMs - first.durationMs) / 1000 : nil
                                         Text([c.source, c.year.map(String.init), diff.map { $0 <= 3 ? "length matches" : "\($0)s off" }].compactMap { $0 }.joined(separator: " · "))
                                             .text(.labelS).foregroundStyle(diff.map { $0 <= 3 } == true ? Color.green : .secondary)
                                     }

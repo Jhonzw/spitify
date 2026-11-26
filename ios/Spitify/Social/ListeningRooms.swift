@@ -119,7 +119,7 @@ final class ListeningRooms {
         room.currentID = index.map { tracks[$0].id }
         room.speed = app.player.speed
         room.positionMs = Int64(app.player.position * 1000); room.playing = app.player.isPlaying && room.currentID != nil
-        let changed = previous.queue != room.queue || previous.currentID != room.currentID || previous.playing != room.playing || previous.speed != room.speed || abs(RoomState.expectedPosition(previous) - room.positionMs) > 2_000
+        let changed = previous.queue != room.queue || previous.currentID != room.currentID || previous.playing != room.playing || previous.speed != room.speed || Swift.abs(RoomState.expectedPosition(previous) - room.positionMs) > 2_000
         guard changed || SocialRules.now - previous.observedAt >= 5_000 else { return }
         room.observedAt = SocialRules.now; room.revision += 1
         do { try await app.social.sendRoom(room) } catch { message = error.localizedDescription }
@@ -144,7 +144,7 @@ final class ListeningRooms {
                 }
                 app.player.setRoomPlayback(speed: room.speed ?? 1)
                 let position = Double(RoomState.expectedPosition(room)) / 1000
-                if abs(app.player.position - position) > 2 { app.player.seek(position) }
+                if Swift.abs(app.player.position - position) > 2 { app.player.seek(position) }
                 if room.playing { if !app.player.isPlaying { app.player.resume() } } else { app.player.pause() }
             } catch { if !Task.isCancelled { message = error.localizedDescription; app.player.pause() } }
         }

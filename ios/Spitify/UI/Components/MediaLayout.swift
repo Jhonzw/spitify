@@ -137,7 +137,7 @@ struct CollectionLayout<Cover: View, Actions: View, Content: View>: View {
         .toolbarBackground(color.mix(p.background, 0.3), for: .navigationBar)
     }
     private var header: some View {
-        let collapse = theme.reduceMotion ? 0 : min(1, max(0, -offset / 300))
+        let collapse = theme.reduceMotion ? 0 : Swift.min(1, Swift.max(0, -offset / 300))
         let headerColor = p.isDark ? color : color.mix(.white, 0.55)
         return VStack(alignment: .leading, spacing: 6) {
             cover()

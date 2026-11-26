@@ -80,7 +80,7 @@ enum MusicCatalog {
             }
         }
         guard durationMs > 0 else { return out }
-        return out.sorted { abs(($0.durationMs > 0 ? $0.durationMs : .max / 2) - durationMs) < abs(($1.durationMs > 0 ? $1.durationMs : .max / 2) - durationMs) }
+        return out.sorted { Swift.abs(($0.durationMs > 0 ? $0.durationMs : .max / 2) - durationMs) < Swift.abs(($1.durationMs > 0 ? $1.durationMs : .max / 2) - durationMs) }
     }
 
     /// Only accept a match when length and title agree - auto-fix never guesses.
@@ -89,7 +89,7 @@ enum MusicCatalog {
         let knownArtist = song.artist.isEmpty || song.artist.lowercased().hasPrefix("unknown") ? nil : song.artist
         let knownAlbum = song.album.isEmpty || song.album.lowercased().hasPrefix("unknown") || song.album == (song.folder as NSString).lastPathComponent ? nil : song.album
         return candidates.filter { c in
-            let lengthOK = song.durationMs > 0 && c.durationMs > 0 && abs(c.durationMs - song.durationMs) <= 3_000
+            let lengthOK = song.durationMs > 0 && c.durationMs > 0 && Swift.abs(c.durationMs - song.durationMs) <= 3_000
             let title = norm(c.title).split(separator: " ").filter { $0.count > 1 }
             let artist = norm(c.artist).split(separator: " ").filter { $0.count > 1 }
             let artistOK = knownArtist.map { norm($0) == norm(c.artist) } ?? (!artist.isEmpty && artist.allSatisfy(words.contains))

@@ -391,7 +391,7 @@ final class DeviceSyncStore {
         guard let app, !state.devices.isEmpty, !roomListener, let playback = snapshot(app.player) else { heartbeatTask?.cancel(); return }
         let signature = [playback.current?.title ?? "", playback.current?.artist ?? "", String(playback.playing), String(playback.currentIndex),
                          playback.queue.map { $0.title + "|" + $0.artist }.joined(separator: "\n"), playback.source ?? "", String(playback.speed)].joined(separator: "\u{1}")
-        let moved = lastSent.map { abs(DeviceSyncState.expectedPosition($0.state, receivedAt: $0.at) - playback.positionMs) > 2_000 } ?? true
+        let moved = lastSent.map { Swift.abs(DeviceSyncState.expectedPosition($0.state, receivedAt: $0.at) - playback.positionMs) > 2_000 } ?? true
         if force || lastSent?.signature != signature || moved {
             await sendState(playback)
             lastSent = (signature, playback, SocialRules.now)

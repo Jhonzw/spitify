@@ -63,12 +63,12 @@ struct SongRow: View {
         .simultaneousGesture(DragGesture(minimumDistance: 20)
             .onChanged { value in
                 let x = value.translation.width
-                guard x > abs(value.translation.height) * 1.5 else { swipeX = 0; return }
+                guard x > Swift.abs(value.translation.height) * 1.5 else { swipeX = 0; return }
                 suppressTapUntil = Date().addingTimeInterval(0.4)
                 swipeX = min(x, 115)
             }
             .onEnded { value in
-                if swipeX >= 72 && value.translation.width > abs(value.translation.height) * 1.5 {
+                if swipeX >= 72 && value.translation.width > Swift.abs(value.translation.height) * 1.5 {
                     suppressTapUntil = Date().addingTimeInterval(0.4)
                     app.player.addToQueue([song])
                     if song.playable { Haptics.tap() }
@@ -285,7 +285,7 @@ struct EqualizerBars: View {
             Canvas { g, size in
                 let w = size.width / 5
                 for i in 0..<3 {
-                    let h = playing ? size.height * (0.3 + 0.7 * abs(sin(t * (3.5 + Double(i) * 1.3) + Double(i)))) : size.height * 0.3
+                    let h = playing ? size.height * (0.3 + 0.7 * Swift.abs(sin(t * (3.5 + Double(i) * 1.3) + Double(i)))) : size.height * 0.3
                     g.fill(Path(roundedRect: CGRect(x: w * Double(i * 2), y: size.height - h, width: w, height: h), cornerRadius: w / 2), with: .color(color ?? p.accent))
                 }
             }

@@ -28,10 +28,10 @@ enum AudioLeveling {
                     guard buffer.frameLength > 0, let channels = buffer.floatChannelData else { break }
                     let frames = Int(buffer.frameLength), channelCount = Int(format.channelCount)
                     if format.isInterleaved {
-                        for i in 0..<(frames * channelCount) { let v = Double(channels[0][i]); guard v.isFinite else { continue }; total += v * v; peak = max(peak, abs(v)); samples += 1 }
+                        for i in 0..<(frames * channelCount) { let v = Double(channels[0][i]); guard v.isFinite else { continue }; total += v * v; peak = max(peak, Swift.abs(v)); samples += 1 }
                     } else {
                         for channel in 0..<channelCount {
-                            for i in 0..<frames { let v = Double(channels[channel][i]); guard v.isFinite else { continue }; total += v * v; peak = max(peak, abs(v)); samples += 1 }
+                            for i in 0..<frames { let v = Double(channels[channel][i]); guard v.isFinite else { continue }; total += v * v; peak = max(peak, Swift.abs(v)); samples += 1 }
                         }
                     }
                     left -= AVAudioFramePosition(frames)
@@ -90,7 +90,7 @@ final class StreamLeveling {
             let size = Int(buffer.mDataByteSize) / MemoryLayout<Float>.size
             for i in 0..<size {
                 let value = data[i].isFinite ? Double(data[i]) : 0
-                blockEnergy += value * value; peak = max(peak, abs(value)); count += 1
+                blockEnergy += value * value; peak = max(peak, Swift.abs(value)); count += 1
             }
         }
         guard count > 0 else { return }

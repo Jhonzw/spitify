@@ -32,7 +32,7 @@ actor ArchiveAudio {
         let tried = Set(track.attemptedSources ?? [])
         guard let choice = choices.first(where: {
             !tried.contains($0.url) && Self.songName($0.title, artist: track.artist) == SearchMatch.fold(track.title) &&
-            ($0.durationMs == nil || abs($0.durationMs! - track.durationMs) <= 3000)
+            ($0.durationMs == nil || Swift.abs($0.durationMs! - track.durationMs) <= 3000)
         }) else { return nil }
         var result = track
         result.audioURL = choice.url; result.audioExtension = choice.ext; result.audioByteCount = choice.byteCount; result.playable = true

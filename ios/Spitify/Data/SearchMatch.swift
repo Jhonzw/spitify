@@ -23,6 +23,6 @@ enum SearchMatch {
     }
     static func sameSong(_ song: Song, _ track: OnlineTrack) -> Bool {
         fold(song.title) == fold(track.title) && fold(song.artist) == fold(track.artist) &&
-            song.durationMs > 0 && track.durationMs > 0 && abs(song.durationMs - track.durationMs) <= 3_000
+            song.durationMs > 0 && track.durationMs > 0 && Swift.abs(song.durationMs - track.durationMs) <= 3_000
     }
 }

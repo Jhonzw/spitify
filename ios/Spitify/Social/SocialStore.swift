@@ -265,7 +265,7 @@ enum SharedSongMatch {
 
         func same(_ title: String, _ artist: String, _ duration: Int64) -> Bool {
             SearchMatch.fold(title) == SearchMatch.fold(track.title) && SearchMatch.fold(artist) == SearchMatch.fold(track.artist)
-            && (track.durationMs == 0 || abs(duration - track.durationMs) < 5000)
+            && (track.durationMs == 0 || Swift.abs(duration - track.durationMs) < 5000)
         }
         if let local = app.library.library.songs.first(where: { same($0.title, $0.artist, $0.durationMs) }) { return local }
         if let id = track.sourceID {

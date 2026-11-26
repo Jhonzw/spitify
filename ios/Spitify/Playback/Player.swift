@@ -546,8 +546,8 @@ final class Player {
         let playing = usingStream ? stream.isPlaying : engine.isPlaying
         // Only assign real changes: every write notifies every view that reads the value.
         let now = usingStream ? stream.currentTime : engine.currentTime
-        if abs(now - position) > 0.01 { position = now }
-        if usingStream, stream.duration > 0, abs(stream.duration - duration) > 0.01 { duration = stream.duration }
+        if Swift.abs(now - position) > 0.01 { position = now }
+        if usingStream, stream.duration > 0, Swift.abs(stream.duration - duration) > 0.01 { duration = stream.duration }
         let waiting = usingStream && isPlaying && stream.isWaiting
         if waiting != isBuffering { isBuffering = waiting }
         guard isPlaying, playing, !waiting else { return }

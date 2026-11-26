@@ -104,7 +104,7 @@ struct NowPlayingView: View {
         .overlay { ThemeFrame() }
         .offset(y: max(0, dragDown))
         .simultaneousGesture(DragGesture(minimumDistance: 14).onChanged { value in
-            if canCollapse == nil { canCollapse = scrollTop >= -2 && value.translation.height > abs(value.translation.width) * 1.3 }
+            if canCollapse == nil { canCollapse = scrollTop >= -2 && value.translation.height > Swift.abs(value.translation.width) * 1.3 }
             if canCollapse == true { dragDown = max(0, value.translation.height) }
         }.onEnded { value in
             if canCollapse == true && PlayerDismissGesture.shouldDismiss(distance: dragDown, predicted: value.predictedEndTranslation.height) { dismiss() }

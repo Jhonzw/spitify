@@ -228,7 +228,7 @@ struct FLACInfo: Equatable {
             }
         }
         guard let info, try file.offset() < size else { throw MusicSourceError.message("The download contains no audio.") }
-        if expectedDurationMs > 0, abs(info.durationMs - expectedDurationMs) > 5_000 {
+        if expectedDurationMs > 0, Swift.abs(info.durationMs - expectedDurationMs) > 5_000 {
             throw MusicSourceError.message("The downloaded song's length does not match. It was not added.")
         }
         return info
