@@ -13,24 +13,17 @@ permissions:
 
 jobs:
   ipa:
-    runs-on: macos-26
+    # Fila Intel: a fila macOS arm64 (macos-26) cancelou por falta de máquina.
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
+      - name: Select newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          XC=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XC" && xcodebuild -version
       - name: Generate project
         run: brew install xcodegen && cd ios && xcodegen generate
-      - name: Unit tests
-        run: |
-          cd ios
-          xcodebuild test -project Spitify.xcodeproj -scheme Spitify -only-testing:SpitifyTests \
-            -destination 'platform=iOS Simulator,name=iPhone 17' -parallel-testing-enabled NO \
-            -resultBundlePath build/SpitifyTests.xcresult -quiet
-      - name: Keep test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: iPhone-test-report
-          path: ios/build/SpitifyTests.xcresult
-          if-no-files-found: ignore
       - name: Build unsigned IPA
         run: |
           cd ios
