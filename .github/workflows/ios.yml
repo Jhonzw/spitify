@@ -13,14 +13,14 @@ permissions:
 
 jobs:
   ipa:
-    # Fila Intel: a fila macOS arm64 (macos-26) cancelou por falta de máquina.
-    runs-on: macos-15-intel
+    # macos-15 (arm64) com Xcode 26: a fila macos-26 cancelou por falta de máquina e a Intel só tem Xcode 16.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Select newest Xcode
         run: |
           ls -d /Applications/Xcode*.app
-          XC=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          XC=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)
           sudo xcode-select -s "$XC" && xcodebuild -version
       - name: Generate project
         run: brew install xcodegen && cd ios && xcodegen generate
